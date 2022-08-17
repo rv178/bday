@@ -1,0 +1,33 @@
+[env]
+BIN_NAME="bday"
+COMPILER_FLAGS="--release"
+INSTALL_PREFIX="/usr/bin"
+
+[build]
+cmd = """
+cargo build $COMPILER_FLAGS &&
+cp -r ./target/release/$BIN_NAME ./bin/$BIN_NAME
+"""
+
+[custom.clean]
+cmd = "cargo clean"
+run = false
+
+[custom.setup]
+cmd = """
+mkdir -p bin &&
+rustup install stable &&
+rustup default stable
+"""
+run = false
+
+[custom.install]
+cmd = "cp ./bin/$BIN_NAME $INSTALL_PREFIX/$BIN_NAME"
+run = false
+
+[custom.uninstall]
+cmd = "rm -rf $INSTALL_PREFIX/$BIN_NAME"
+run = false
+
+[pre.fmt]
+cmd = "cargo fmt"
