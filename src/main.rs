@@ -1,6 +1,5 @@
 use chrono::prelude::*;
 use prettytable::Table;
-use rand;
 use serde_derive::{Deserialize, Serialize};
 use std::{cmp::Ordering, env, fs, io, io::Write, process::exit};
 
