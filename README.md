@@ -23,10 +23,10 @@ bday list
 
 #### Add a person
 
-- * Birthday should be in `day-month-year` format.
+- Birthday should be in `day-month-year` format. eg: `17-08-2006`
 
 ```
-bday add [name] [birthday*]
+bday add [name] [birthday]
 ```
 
 #### Remove a person
