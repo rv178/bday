@@ -198,11 +198,9 @@ fn next_occurance(date: NaiveDate) -> NaiveDate {
     let now = Utc::now().naive_local().date();
 
     if now.month() <= date.month() && now.day() <= date.day() {
-        println!("current year");
         date.with_year(now.year())
             .expect("oops something went wrong")
     } else {
-        println!("next year");
         date.with_year(now.year() + 1)
             .expect("oops something went wrong")
     }
