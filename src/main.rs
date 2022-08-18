@@ -70,6 +70,19 @@ fn main() -> io::Result<()> {
                         .with_style(Attr::ForegroundColor(color::GREEN))
                         .with_style(Attr::Bold),
                 ]));
+
+                // sort birthdays by remaining days
+                bdays.list.sort_by(|a, b| {
+                    let now = Utc::now().naive_local().date();
+                    let count_a = next_occurance(parse_date(&a.bday))
+                        .signed_duration_since(now)
+                        .num_days();
+                    let count_b = next_occurance(parse_date(&b.bday))
+                        .signed_duration_since(now)
+                        .num_days();
+                    count_a.cmp(&count_b)
+                });
+
                 for person in &bdays.list {
                     let bday = parse_date(&person.bday);
                     let next_bday = next_occurance(bday);
