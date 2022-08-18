@@ -33,7 +33,7 @@ impl Person {
 
 fn main() -> io::Result<()> {
     let mut bdays = Bdays::new();
-    let path: &String = &format!(
+    let path: &str = &format!(
         "{}/.config/bdays.json",
         env::var("HOME").expect("Failed to get home directory.")
     );
@@ -66,10 +66,10 @@ fn main() -> io::Result<()> {
                     Cell::new("Birthday")
                         .with_style(Attr::ForegroundColor(color::GREEN))
                         .with_style(Attr::Bold),
-                    Cell::new("Days until Birthday")
+                    Cell::new("Till next bday")
                         .with_style(Attr::ForegroundColor(color::GREEN))
                         .with_style(Attr::Bold),
-                    Cell::new("Age at next Birthday")
+                    Cell::new("Age at next bday")
                         .with_style(Attr::ForegroundColor(color::GREEN))
                         .with_style(Attr::Bold),
                 ]));
@@ -98,9 +98,12 @@ fn main() -> io::Result<()> {
                             .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
                         Cell::new(&get_formatted_date(&person.bday))
                             .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
-                        Cell::new(&next_bday.signed_duration_since(now).num_days().to_string())
-                            .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
-                        Cell::new(&(next_bday.year() - bday.year()).to_string())
+                        Cell::new(&format!(
+                            "{} days",
+                            next_bday.signed_duration_since(now).num_days()
+                        ))
+                        .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
+                        Cell::new(&format!("{} years", (next_bday.year() - bday.year())))
                             .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
                     ]));
                 }
@@ -116,7 +119,7 @@ fn main() -> io::Result<()> {
                 let name = &args[2];
                 let bday = &args[3];
 
-                let split = bday.split("-").collect::<Vec<&str>>();
+                let split = bday.split('-').collect::<Vec<&str>>();
                 let day = split[0].parse::<u32>().unwrap();
                 let month = split[1].parse::<u32>().unwrap();
                 let year = split[2].parse::<i32>().unwrap();
@@ -205,12 +208,12 @@ Link: \x1b[4m\x1b[34mhttps://github.com/rv178/bday\x1b[0m",
     println!("{}", help_msg);
 }
 
-fn get_formatted_date(date: &String) -> String {
+fn get_formatted_date(date: &str) -> String {
     parse_date(date).format("%d %B").to_string()
 }
 
-fn parse_date(date: &String) -> NaiveDate {
-    NaiveDate::parse_from_str(&date, "%d %B %Y").expect("Birthday not formatted properly!")
+fn parse_date(date: &str) -> NaiveDate {
+    NaiveDate::parse_from_str(date, "%d %B %Y").expect("Birthday not formatted properly!")
 }
 
 fn next_occurance(date: NaiveDate) -> NaiveDate {
