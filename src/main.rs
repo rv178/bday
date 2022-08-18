@@ -33,7 +33,10 @@ impl Person {
 
 fn main() -> io::Result<()> {
     let mut bdays = Bdays::new();
-    let path: &String = &format!("{}/.config/bdays.json", env!("HOME"));
+    let path: &String = &format!(
+        "{}/.config/bdays.json",
+        env::var("HOME").expect("Failed to get home directory.")
+    );
 
     if let Ok(json) = fs::read_to_string(path) {
         let bday_list: Vec<Person> = serde_json::from_str(&json)?;
@@ -182,8 +185,10 @@ fn help() {
     let help_msg = format!(
         "\x1b[32m\x1b[1mBday \x1b[0m {}
     Birthday tracker.
+
 \x1b[33mUSAGE:\x1b[0m
     bday \x1b[32m[OPTIONS]\x1b[0m
+
 \x1b[33mOPTIONS:\x1b[0m
     \x1b[32mhelp\x1b[0m
         Show this help message.
@@ -191,8 +196,9 @@ fn help() {
         Remove a person.
     \x1b[32mls/list\x1b[0m
         List birthdays.
-    \x1b[32madd [name] [date (in day-month-year format)]\x1b[0m
+    \x1b[32madd [name] [day-month-year]\x1b[0m
         Add a person.
+
 Link: \x1b[4m\x1b[34mhttps://github.com/rv178/bday\x1b[0m",
         env!("CARGO_PKG_VERSION")
     );
