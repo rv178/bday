@@ -33,7 +33,7 @@ impl Person {
 
 fn main() -> io::Result<()> {
     let mut bdays = Bdays::new();
-    let path: &String = &format!("/home/{}/.config/bdays.json", env!("USER"));
+    let path: &String = &format!("{}/.config/bdays.json", env!("HOME"));
 
     if let Ok(json) = fs::read_to_string(path) {
         let bday_list: Vec<Person> = serde_json::from_str(&json)?;
@@ -63,14 +63,28 @@ fn main() -> io::Result<()> {
                     Cell::new("Birthday")
                         .with_style(Attr::ForegroundColor(color::GREEN))
                         .with_style(Attr::Bold),
+                    Cell::new("Days until Birthday")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
+                    Cell::new("Age at next Birthday")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
                 ]));
                 for person in &bdays.list {
+                    let bday = parse_date(&person.bday);
+                    let next_bday = next_occurance(bday);
+                    let now = Utc::now().naive_local().date();
+
                     table.add_row(Row::new(vec![
                         Cell::new(&person.id.to_string())
                             .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
                         Cell::new(&person.name)
                             .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
-                        Cell::new(&person.bday)
+                        Cell::new(&get_formatted_date(&person.bday))
+                            .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
+                        Cell::new(&next_bday.signed_duration_since(now).num_days().to_string())
+                            .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
+                        Cell::new(&(next_bday.year() - bday.year()).to_string())
                             .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
                     ]));
                 }
@@ -79,8 +93,8 @@ fn main() -> io::Result<()> {
             }
             "add" => {
                 if args.len() < 4 {
-                    println!("Enter the required arguments! \"bday add [name] [date]\"");
-                    exit(1);
+                    println!("Enter the required arguments! \"bday add [name] [day-month-year]\"");
+                    exit(0);
                 }
 
                 let name = &args[2];
@@ -92,7 +106,7 @@ fn main() -> io::Result<()> {
                 let year = split[2].parse::<i32>().unwrap();
 
                 let date = NaiveDate::from_ymd(year, month, day)
-                    .format("%d %B")
+                    .format("%d %B %Y")
                     .to_string();
 
                 let id = (bdays.index + rand::random::<u32>()) % 1000;
@@ -170,4 +184,24 @@ Link: \x1b[4m\x1b[34mhttps://github.com/rv178/rvfetch\x1b[0m",
         env!("CARGO_PKG_VERSION")
     );
     println!("{}", help_msg);
+}
+
+fn get_formatted_date(date: &String) -> String {
+    parse_date(date).format("%d %B").to_string()
+}
+
+fn parse_date(date: &String) -> NaiveDate {
+    NaiveDate::parse_from_str(&date, "%d %B %Y").expect("bday not formatted properly")
+}
+
+fn next_occurance(date: NaiveDate) -> NaiveDate {
+    let now = Utc::now().naive_local().date();
+
+    if now.month() <= date.month() && now.day() <= date.day() {
+        date.with_year(now.year())
+            .expect("oops something went wrong")
+    } else {
+        date.with_year(now.year() + 1)
+            .expect("oops something went wrong")
+    }
 }
