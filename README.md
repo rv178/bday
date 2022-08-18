@@ -2,7 +2,7 @@
 
 Birthday tracker.
 
-![Alt](https://media.discordapp.net/attachments/635625917623828520/1009715066356125757/unknown.png)
+![Alt](./assets/ss.png)
 
 ### Compiling
 
