@@ -71,9 +71,10 @@ fn main() -> io::Result<()> {
                         .with_style(Attr::Bold),
                 ]));
 
+                let now = Utc::now().naive_local().date();
+
                 // sort birthdays by remaining days
                 bdays.list.sort_by(|a, b| {
-                    let now = Utc::now().naive_local().date();
                     let count_a = next_occurance(parse_date(&a.bday))
                         .signed_duration_since(now)
                         .num_days();
@@ -86,7 +87,6 @@ fn main() -> io::Result<()> {
                 for person in &bdays.list {
                     let bday = parse_date(&person.bday);
                     let next_bday = next_occurance(bday);
-                    let now = Utc::now().naive_local().date();
 
                     table.add_row(Row::new(vec![
                         Cell::new(&person.id.to_string())
@@ -193,7 +193,7 @@ fn help() {
         List birthdays.
     \x1b[32madd [name] [date (in day-month-year format)]\x1b[0m
         Add a person.
-Link: \x1b[4m\x1b[34mhttps://github.com/rv178/rvfetch\x1b[0m",
+Link: \x1b[4m\x1b[34mhttps://github.com/rv178/bday\x1b[0m",
         env!("CARGO_PKG_VERSION")
     );
     println!("{}", help_msg);
@@ -204,17 +204,17 @@ fn get_formatted_date(date: &String) -> String {
 }
 
 fn parse_date(date: &String) -> NaiveDate {
-    NaiveDate::parse_from_str(&date, "%d %B %Y").expect("bday not formatted properly")
+    NaiveDate::parse_from_str(&date, "%d %B %Y").expect("Birthday not formatted properly!")
 }
 
 fn next_occurance(date: NaiveDate) -> NaiveDate {
     let now = Utc::now().naive_local().date();
 
-    if now.month() <= date.month() && now.day() <= date.day() {
-        date.with_year(now.year())
-            .expect("oops something went wrong")
-    } else {
+    if now.day() >= date.day() && now.month() >= date.month() {
         date.with_year(now.year() + 1)
-            .expect("oops something went wrong")
+            .expect("Oops something went wrong!")
+    } else {
+        date.with_year(now.year())
+            .expect("Oops something went wrong!")
     }
 }
