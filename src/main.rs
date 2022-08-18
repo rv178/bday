@@ -51,7 +51,7 @@ fn main() -> io::Result<()> {
                 help();
                 exit(0);
             }
-            "list" => {
+            "ls" | "list" => {
                 let mut table = Table::new();
                 table.add_row(Row::new(vec![
                     Cell::new("ID")
@@ -106,7 +106,7 @@ fn main() -> io::Result<()> {
 
                 bdays.list.push(person);
             }
-            "rm" => {
+            "rm" | "remove" => {
                 if args.len() < 3 {
                     println!("Please enter an id.");
                     exit(1);
@@ -151,16 +151,6 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-//fn input(msg: &str) -> io::Result<String> {
-//let mut reply: String = String::new();
-//print!("{}", msg);
-
-//io::stdout().flush()?;
-//io::stdin().read_line(&mut reply)?;
-
-//Ok(reply.trim_end().to_owned())
-//}
-
 fn help() {
     let help_msg = format!(
         "\x1b[32m\x1b[1mBday \x1b[0m {}
@@ -170,9 +160,9 @@ fn help() {
 \x1b[33mOPTIONS:\x1b[0m
     \x1b[32mhelp\x1b[0m
         Show this help message.
-    \x1b[32mrm [id]\x1b[0m
+    \x1b[32mrm/remove [id]\x1b[0m
         Remove a person.
-    \x1b[32mlist\x1b[0m
+    \x1b[32mls/list\x1b[0m
         List birthdays.
     \x1b[32madd [name] [date (in day-month-year format)]\x1b[0m
         Add a person.
