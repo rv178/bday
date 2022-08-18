@@ -1,7 +1,7 @@
 use chrono::prelude::*;
-use prettytable::Table;
+use prettytable::{color, Attr, Cell, Row, Table};
 use serde_derive::{Deserialize, Serialize};
-use std::{cmp::Ordering, env, fs, io, io::Write, process::exit};
+use std::{cmp::Ordering, env, fs, io, process::exit};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Bdays {
@@ -53,17 +53,38 @@ fn main() -> io::Result<()> {
             }
             "list" => {
                 let mut table = Table::new();
-                table.add_row(prettytable::row!["ID", "Name", "Birthday"]);
+                table.add_row(Row::new(vec![
+                    Cell::new("ID")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
+                    Cell::new("Name")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
+                    Cell::new("Birthday")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
+                ]));
                 for person in &bdays.list {
-                    table.add_row(prettytable::row![person.id, person.name, person.bday]);
+                    table.add_row(Row::new(vec![
+                        Cell::new(&person.id.to_string())
+                            .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                        Cell::new(&person.name)
+                            .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
+                        Cell::new(&person.bday)
+                            .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
+                    ]));
                 }
                 table.printstd();
                 exit(0);
             }
             "add" => {
-                let name = input("Enter name: ").expect("Enter a valid name.");
-                let bday = input("Enter birthday date (day-month-year): ")
-                    .expect("Enter a valid birthday.");
+                if args.len() < 4 {
+                    println!("Enter the required arguments! \"bday add [name] [date]\"");
+                    exit(1);
+                }
+
+                let name = &args[2];
+                let bday = &args[3];
 
                 let split = bday.split("-").collect::<Vec<&str>>();
                 let day = split[0].parse::<u32>().unwrap();
@@ -71,13 +92,17 @@ fn main() -> io::Result<()> {
                 let year = split[2].parse::<i32>().unwrap();
 
                 let date = NaiveDate::from_ymd(year, month, day)
-                    .format("%A, %d %B %Y")
+                    .format("%d %B")
                     .to_string();
 
                 let id = (bdays.index + rand::random::<u32>()) % 1000;
                 bdays.index += 1;
 
-                let person = Person::new(name, date, id);
+                println!(
+                    "Added \"{}\" with birthday on {}. (ID: {}).",
+                    name, date, id
+                );
+                let person = Person::new(name.to_owned(), date, id);
 
                 bdays.list.push(person);
             }
@@ -126,15 +151,15 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn input(msg: &str) -> io::Result<String> {
-    let mut reply: String = String::new();
-    print!("{}", msg);
+//fn input(msg: &str) -> io::Result<String> {
+//let mut reply: String = String::new();
+//print!("{}", msg);
 
-    io::stdout().flush()?;
-    io::stdin().read_line(&mut reply)?;
+//io::stdout().flush()?;
+//io::stdin().read_line(&mut reply)?;
 
-    Ok(reply.trim_end().to_owned())
-}
+//Ok(reply.trim_end().to_owned())
+//}
 
 fn help() {
     let help_msg = format!(
@@ -149,7 +174,7 @@ fn help() {
         Remove a person.
     \x1b[32mlist\x1b[0m
         List birthdays.
-    \x1b[32madd\x1b[0m
+    \x1b[32madd [name] [date (in day-month-year format)]\x1b[0m
         Add a person.
 Link: \x1b[4m\x1b[34mhttps://github.com/rv178/rvfetch\x1b[0m",
         env!("CARGO_PKG_VERSION")
