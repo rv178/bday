@@ -6,6 +6,10 @@ Birthday tracker.
 
 ### Compiling
 
+#### Arch Linux
+
+Bday is available in the AUR ([bday-git](https://aur.archlinux.org/packages/bday-git)).
+
 You can compile it using `cargo` or install [baker](https://github.com/rv178/baker) and compile it like this:
 
 ```
