@@ -47,7 +47,9 @@ fn main() -> io::Result<()> {
         fs::write(path, json)?;
     }
 
+    let now = Utc::now().naive_local().date();
     let args: Vec<String> = env::args().collect();
+
     match args.len().cmp(&1) {
         Ordering::Greater => match args[1].as_str() {
             "help" => {
@@ -73,8 +75,6 @@ fn main() -> io::Result<()> {
                         .with_style(Attr::ForegroundColor(color::GREEN))
                         .with_style(Attr::Bold),
                 ]));
-
-                let now = Utc::now().naive_local().date();
 
                 // sort birthdays by remaining days
                 bdays.list.sort_by(|a, b| {
@@ -165,6 +165,39 @@ fn main() -> io::Result<()> {
                     println!("No person with ID {} found.", id);
                 }
             }
+            "td" | "today" => {
+                let mut table = Table::new();
+
+                println!("Birthdays today:");
+                println!();
+
+                table.add_row(Row::new(vec![
+                    Cell::new("ID")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
+                    Cell::new("Name")
+                        .with_style(Attr::ForegroundColor(color::GREEN))
+                        .with_style(Attr::Bold),
+                ]));
+
+                for person in &bdays.list {
+                    let bday = parse_date(&person.bday);
+                    if bday.day() == now.day() && bday.month() == now.month() {
+                        table.add_row(Row::new(vec![
+                            Cell::new(&person.id.to_string())
+                                .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                            Cell::new(&person.name)
+                                .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
+                        ]));
+                    }
+                }
+
+                if table.len() == 1 {
+                    println!("No birthdays :(");
+                } else {
+                    table.printstd();
+                }
+            }
             _ => {
                 println!("Invalid option '{}'.", args[1]);
                 exit(1);
@@ -201,6 +234,8 @@ fn help() {
         List birthdays.
     \x1b[32madd [name] [day-month-year]\x1b[0m
         Add a person.
+    \x1b[32mtd/today\x1b[0m
+        List today's birthdays.
 
 Link: \x1b[4m\x1b[34mhttps://github.com/rv178/bday\x1b[0m",
         env!("CARGO_PKG_VERSION")
