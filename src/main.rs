@@ -100,7 +100,7 @@ fn main() -> io::Result<()> {
                             .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
                         Cell::new(&format!(
                             "{} days",
-                            next_bday.signed_duration_since(now).num_days()
+                            next_bday.signed_duration_since(now).num_days() - 1
                         ))
                         .with_style(Attr::ForegroundColor(color::BRIGHT_CYAN)),
                         Cell::new(&format!("{} years", (next_bday.year() - bday.year())))
@@ -217,7 +217,10 @@ fn parse_date(date: &str) -> NaiveDate {
 }
 
 fn next_occurance(now: NaiveDate, date: NaiveDate) -> NaiveDate {
-    if now.day() >= date.day() && now.month() >= date.month() {
+    if date.month() <= now.month() && date.day() <= now.day() {
+        date.with_year(now.year() + 1)
+            .expect("Oops something went wrong!")
+    } else if date.month() < now.month() && date.day() >= now.day() {
         date.with_year(now.year() + 1)
             .expect("Oops something went wrong!")
     } else {
