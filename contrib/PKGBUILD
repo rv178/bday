@@ -2,7 +2,7 @@
 
 _pkgname=bday
 pkgname="${_pkgname}-git"
-pkgver=1.0.0.32.g508b2f6
+pkgver=0.1.0.15.g9c82d4a
 pkgrel=1
 pkgdesc="CLI birthday tracker."
 arch=("x86_64")
@@ -26,6 +26,6 @@ build() {
 
 package() {
 	cd "$_pkgname"
-	install -Dm 755 ./target/release/bake "$pkgdir/usr/bin/bake"
+	install -Dm 755 ./target/release/bday "$pkgdir/usr/bin/bday"
 }
 
