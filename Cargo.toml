@@ -6,9 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = "0.4.22"
-prettytable-rs = "0.9.0"
+chrono = "0.4.38"
+prettytable-rs = "0.10.0"
 rand = "0.8.5"
-serde = "1.0.139"
-serde_derive = "1.0.139"
-serde_json = "1.0.82"
+serde = "1.0.203"
+serde_derive = "1.0.203"
+serde_json = "1.0.117"
